@@ -85,7 +85,7 @@ class AskGPT(interfaces.plugins.PluginInterface):
         for _, (process_name, cmdline) in procs:
             table += process_name + "\t" + cmdline + "\n"
         
-        print(table)
+        # print(table)
         
         # Table contains all process
         # No we ask ChatGPT
