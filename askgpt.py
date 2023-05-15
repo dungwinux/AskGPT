@@ -86,21 +86,26 @@ class AskGPT(interfaces.plugins.PluginInterface):
         """Send information to ChatGPT and ask for answer"""
 
         table = ""
+        unique_proc = set()
         for _, (process_name, cmdline) in procs:
+            cmdline: str
+            if process_name in unique_proc:
+                continue
+            unique_proc.add(process_name)
+            if cmdline.startswith("\""):
+                cmdline = cmdline[1:cmdline.index("\"", 1)]
+            else:
+                cmdline = cmdline.split(" ")[0]
             table += process_name + "\t" + cmdline + "\n"
         
         # print(table)
 
-        user_question = "Do you know what the computer is being used for?"
+        user_question = "Given process list above, do you know what the computer is being used for?"
         cur_content = table + '\n' + user_question
 
         model_id = "gpt-3.5-turbo"
         completion = openai.ChatCompletion.create(model=model_id, messages=[{"role": "user", "content": cur_content}])
         response = completion.choices[0].message.content
-        
-        # Table contains all process
-        # No we ask ChatGPT
-        # Perhaps use self.API_KEY
 
         # Return string result from ChatGPT
         return response
