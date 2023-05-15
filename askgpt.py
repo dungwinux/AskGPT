@@ -100,7 +100,7 @@ class AskGPT(interfaces.plugins.PluginInterface):
         
         # print(table)
 
-        user_question = "Given process list above, do you know what the computer is being used for?"
+        user_question = "Given process list above, do you know what the computer is being used for? And does it contain any known malware?"
         cur_content = table + '\n' + user_question
 
         model_id = "gpt-3.5-turbo"
