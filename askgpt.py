@@ -9,6 +9,10 @@ from volatility3.framework.configuration import requirements
 from volatility3.framework.objects import utility
 from volatility3.plugins.windows import cmdline, pslist
 
+import openai
+
+openai.api_key = "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"
+
 
 vollog = logging.getLogger(__name__)
 
@@ -86,13 +90,20 @@ class AskGPT(interfaces.plugins.PluginInterface):
             table += process_name + "\t" + cmdline + "\n"
         
         # print(table)
+
+        user_question = "Do you know what the computer is being used for?"
+        cur_content = table + '\n' + user_question
+
+        model_id = "gpt-3.5-turbo"
+        completion = openai.ChatCompletion.create(model=model_id, messages=[{"role": "user", "content": cur_content}])
+        response = completion.choices[0].message.content
         
         # Table contains all process
         # No we ask ChatGPT
         # Perhaps use self.API_KEY
 
         # Return string result from ChatGPT
-        return ""
+        return response
 
     def run(self):
         kernel = self.context.modules[self.config["kernel"]]
