@@ -1,11 +1,13 @@
 # AskGPT
 
-## Prerequisite
+![Running AskGPT](images/screenshot.png)
 
--   volatility3:
+## Prerequisites
+
+-   Volatility3:
     -   Base: `git clone https://github.com/volatilityfoundation/volatility3`
     -   Windows symbol: See [volatility3/README.md](https://github.com/volatilityfoundation/volatility3#symbol-tables)
--   openai
+-   openai Python package
     -   Pip: `pip install openai`
 
 ## Running
