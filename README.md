@@ -24,3 +24,9 @@ Example:
 ```
 python vol.py -p D:\git\AskGPT -f windows.mem.ram askgpt.AskGPT
 ```
+
+## Screenshots
+
+### Rensenware
+
+![Scanning Windows 7 running Rensenware](images/rensenware2.png)

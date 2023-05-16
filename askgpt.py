@@ -2,7 +2,7 @@
 # which is available at https://www.volatilityfoundation.org/license/vsl-v1.0
 #
 import logging
-from typing import List
+from typing import List, Tuple
 
 from volatility3.framework import exceptions, interfaces, renderers
 from volatility3.framework.configuration import requirements
@@ -38,6 +38,12 @@ class AskGPT(interfaces.plugins.PluginInterface):
             ),
             requirements.VersionRequirement(
                 name="pslist", component=pslist.PsList, version=(2, 0, 0)
+            ),
+            requirements.StringRequirement(
+                name="model_id",
+                description="OpenAI ChatGPT model select",
+                optional=True,
+                default="gpt-3.5-turbo"
             ),
         ]
 
@@ -82,7 +88,7 @@ class AskGPT(interfaces.plugins.PluginInterface):
 
             yield (0, (process_name, result_text))
 
-    def ask(self, procs) -> str:
+    def ask(self, procs) -> Tuple[str, str]:
         """Send information to ChatGPT and ask for answer"""
 
         table = ""
@@ -103,12 +109,12 @@ class AskGPT(interfaces.plugins.PluginInterface):
         user_question = "Given process list above, do you know what the computer is being used for? And does it contain any known malware?"
         cur_content = table + '\n' + user_question
 
-        model_id = "gpt-3.5-turbo"
+        model_id = self.config["model_id"]
         completion = openai.ChatCompletion.create(model=model_id, messages=[{"role": "user", "content": cur_content}])
         response = completion.choices[0].message.content
 
         # Return string result from ChatGPT
-        return response
+        return (table, response)
 
     def run(self):
         kernel = self.context.modules[self.config["kernel"]]
@@ -130,9 +136,10 @@ class AskGPT(interfaces.plugins.PluginInterface):
         
         return renderers.TreeGrid(
             [
+                ("Input", str),
                 ("Answer", str),
             ],
             [
-                (0, (self.ask(procs),))
+                (0, self.ask(procs))
             ]
         )
