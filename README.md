@@ -49,7 +49,7 @@ python vol.py -p D:\git\AskGPT -f windows.mem.ram askgpt.AskGPT
 You can also specify the model to use:
 
 ```
-python vol.py -p D:\git\AskGPT --model-id gpt-3.5-turbo -f windows.mem.ram askgpt.AskGPT
+python vol.py -p D:\git\AskGPT -f windows.mem.ram askgpt.AskGPT --model-id gpt-3.5-turbo
 ```
 
 
