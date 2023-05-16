@@ -1,6 +1,7 @@
 # Licensed under the Volatility Software License 1.0
 # which is available at https://www.volatilityfoundation.org/license/vsl-v1.0
-#
+
+import openai
 import logging
 from typing import List, Tuple
 
@@ -8,10 +9,6 @@ from volatility3.framework import exceptions, interfaces, renderers
 from volatility3.framework.configuration import requirements
 from volatility3.framework.objects import utility
 from volatility3.plugins.windows import cmdline, pslist
-
-import openai
-
-openai.api_key = "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"
 
 
 vollog = logging.getLogger(__name__)
@@ -22,7 +19,6 @@ class AskGPT(interfaces.plugins.PluginInterface):
 
     _required_framework_version = (2, 0, 0)
     _version = (0, 0, 1)
-    API_KEY = ""
 
     @classmethod
     def get_requirements(cls) -> List[interfaces.configuration.RequirementInterface]:
@@ -43,7 +39,7 @@ class AskGPT(interfaces.plugins.PluginInterface):
                 name="model_id",
                 description="OpenAI ChatGPT model select",
                 optional=True,
-                default="gpt-3.5-turbo"
+                default="gpt-3.5-turbo",
             ),
         ]
 
@@ -98,19 +94,21 @@ class AskGPT(interfaces.plugins.PluginInterface):
             if process_name in unique_proc:
                 continue
             unique_proc.add(process_name)
-            if cmdline.startswith("\""):
-                cmdline = cmdline[1:cmdline.index("\"", 1)]
+            if cmdline.startswith('"'):
+                cmdline = cmdline[1 : cmdline.index('"', 1)]
             else:
                 cmdline = cmdline.split(" ")[0]
             table += process_name + "\t" + cmdline + "\n"
-        
+
         # print(table)
 
         user_question = "Given process list above, do you know what the computer is being used for? And does it contain any known malware?"
-        cur_content = table + '\n' + user_question
+        cur_content = table + "\n" + user_question
 
         model_id = self.config["model_id"]
-        completion = openai.ChatCompletion.create(model=model_id, messages=[{"role": "user", "content": cur_content}])
+        completion = openai.ChatCompletion.create(
+            model=model_id, messages=[{"role": "user", "content": cur_content}]
+        )
         response = completion.choices[0].message.content
 
         # Return string result from ChatGPT
@@ -119,27 +117,14 @@ class AskGPT(interfaces.plugins.PluginInterface):
     def run(self):
         kernel = self.context.modules[self.config["kernel"]]
         procs = self._generator(
-                pslist.PsList.list_processes(
-                    context=self.context,
-                    layer_name=kernel.layer_name,
-                    symbol_table=kernel.symbol_table_name,
-                )
+            pslist.PsList.list_processes(
+                context=self.context,
+                layer_name=kernel.layer_name,
+                symbol_table=kernel.symbol_table_name,
             )
-        
-        # return renderers.TreeGrid(
-        #     [
-        #         ("Process", str),
-        #         ("Cmdline", str),
-        #     ],
-        #     procs
-        # )
-        
+        )
+
         return renderers.TreeGrid(
-            [
-                ("Input", str),
-                ("Answer", str),
-            ],
-            [
-                (0, self.ask(procs))
-            ]
+            [("Input", str), ("Answer", str)],
+            [(0, self.ask(procs))],
         )

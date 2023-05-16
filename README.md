@@ -9,14 +9,35 @@
     -   Windows symbol: See [volatility3/README.md](https://github.com/volatilityfoundation/volatility3#symbol-tables)
 -   openai Python package
     -   Pip: `pip install openai`
-
+    -   OpenAI API Key
 ## Running
 
-Use `-p` option in Volatility3 to specify this directory. That way, the plugin
-would be discovered.
+First, set your environment variable `OPENAI_API_KEY` to the secret key you received.
+It should starts with `sk-`. **Do not skip this step.** Else you will get `openai.error.AuthenticationError`.
+
+#### bash
+
+```bash
+export OPENAI_API_KEY='sk-...'
+```
+
+#### cmd.exe
+
+```cmd
+set OPENAI_API_KEY=sk-...
+```
+
+#### powershell
+
+```powershell
+$env:OPENAI_API_KEY="sk-..."
+```
+
+Then, use `-p` option in Volatility3 to specify this directory. That way, the plugin
+would be discovered. You can start using the new plugin.
 
 ```
-python vol.py -p <AskGPT directory> -f <image> askgpt.AskGPT
+python vol.py -p <AskGPT directory> -f <image> askgpt.AskGPT --model-id <MODEL_ID>
 ```
 
 Example:
